@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='django-db_locks',
-    version='0.0.3',
+    version='0.0.4',
     packages=['locks', 'locks.management', 'locks.management.commands', 'locks.migrations'],
     url='https://github.com/BlockHub/django-locks',
     license='',
