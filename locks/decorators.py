@@ -1,8 +1,9 @@
 from locks.locks import DbLock
 import time
+import datetime
 
 
-def lock_and_log(logger, uid, raise_error=True, sleep=0):
+def lock_and_log(logger, uid, raise_error=True, sleep=0, expire=False, expiration=False):
     """
     decorator to create a unique lock for a function, log the function and release the lock if an exception occurs.
     if raise_error is set to false, it will simple exit the function (handy for if you don't want to log)
@@ -12,7 +13,7 @@ def lock_and_log(logger, uid, raise_error=True, sleep=0):
         def wrapper(*args, **kwargs):
             lock_name = func.__name__ + __name__ + uid
             lock = DbLock(lock_name)
-            lock.set()
+            lock.set(expire=expire, expiration=expiration if expiration else datetime.datetime.now())
             try:
                 res = func(*args, **kwargs)
                 time.sleep(sleep)
