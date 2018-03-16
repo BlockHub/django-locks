@@ -1,4 +1,4 @@
-from ark.models import Lock
+from locks.models import Lock
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.utils import IntegrityError
