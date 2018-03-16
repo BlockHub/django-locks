@@ -6,7 +6,7 @@ class Lock(models.Model):
     locked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now=True)
     expire = models.BooleanField(default=False)
-    expiration = models.DateTimeField()
+    expiration = models.DateTimeField(null=True)
 
     def __str__(self):
         return self.name

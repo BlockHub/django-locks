@@ -14,25 +14,22 @@ class DbLock:
     def __init__(self, name):
         self.name = name
 
-    @transaction.atomic
     def set(self, hard=False, expire=False, expiration=datetime.datetime.now()):
         try:
             lock = Lock.objects.select_for_update().filter(name=self.name, locked=False).update(locked=True, expire=expire, expiration=expiration)
             if not lock:
-                try:
-                    Lock.objects.select_for_update().create(name=self.name, locked=True)
-                except IntegrityError:
-                    if hard:
-                        pass
-                    lock = Lock.objects.get(name=self.name)
+                lock, created = Lock.objects.get_or_create(name=self.name, locked=True)
+                if not created:
                     if lock.expire:
                         if lock.expiration < datetime.datetime.now():
                             lock.expire = expire
                             lock.expiration = expiration
                             lock.save()
                             return
-                        raise LockOnError("Lock {} hasn't expired yet".format(self.name))
-                    raise LockOnError("Lock {} was on while trying to turn it on".format(self.name))
+                        if not hard:
+                            raise LockOnError("Lock {} hasn't expired yet".format(self.name))
+                    if not hard:
+                        raise LockOnError("Lock {} was on while trying to turn it on".format(self.name))
         except ObjectDoesNotExist:
             Lock.objects.select_for_update().create(name=self.name, locked=False).update(locked=True)
 
